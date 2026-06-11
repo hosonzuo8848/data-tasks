@@ -15,7 +15,7 @@ def lg(m):print(f"[{I}][{time.strftime('%H:%M:%S')}]{m}",flush=True)
 
 def gt(u,tr=8,to=120):
     for i in range(tr):
-        t=u if(i%2==0 or not W)else f"{W}/fetch?url={urllib.parse.quote(u,safe='')}"
+        t=(f"{W}/fetch?url={urllib.parse.quote(u,safe='')}" if(W and i%2==0)else u)
         try:
             r=urllib.request.Request(t,headers={"User-Agent":UA,"Referer":f"https://{H}/"})
             with urllib.request.urlopen(r,timeout=to)as rs:
