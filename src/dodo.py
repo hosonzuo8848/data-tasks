@@ -56,7 +56,7 @@ except Exception as e:
     sys.exit(1)
 
 # 解析 Worker 节点，支持轮询
-worker_urls_raw = os.environ.get("WORKER_URLS", "https://2.1fz.dpdns.org,https://2.bnp.indevs.in,https://2.freezz.dpdns.org")
+worker_urls_raw = os.environ.get("WORKER_URLS", "https://2.1fz.dpdns.org")
 WORKER_URLS = [x.strip() for x in worker_urls_raw.split(",") if x.strip()]
 
 # 默认参数
