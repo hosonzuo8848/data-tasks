@@ -1,0 +1,76 @@
+name: Naikaku Cloud Sync Pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      shard_count:
+        description: 'Total number of shards'
+        required: true
+        default: '20'
+      shard_index:
+        description: 'Current shard index (0-based)'
+        required: true
+        default: '0'
+      max_books:
+        description: 'Max books to process'
+        required: true
+        default: '5'
+      page_workers:
+        description: 'Concurrent page downloading threads'
+        required: true
+        default: '2'
+      r2_webp:
+        description: 'Whether to convert to webp and upload to R2 (1 or 0)'
+        required: true
+        default: '1'
+      worker_urls:
+        description: 'Comma separated Worker URLs'
+        required: true
+        default: 'https://2.1fz.dpdns.org,https://2.bnp.indevs.in,https://2.freezz.dpdns.org'
+      receiver_url:
+        description: 'Target PDF Receiver POST URL'
+        required: true
+        default: ''
+
+jobs:
+  sync_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          echo "[stage] env_check"
+          sudo apt-get update -y && sudo apt-get install -y webp
+          pip install --quiet requests boto3 Pillow PyMuPDF
+
+      - name: Run Pipeline
+        env:
+          SHARD_COUNT: ${{ github.event.inputs.shard_count }}
+          SHARD_INDEX: ${{ github.event.inputs.shard_index }}
+          MAX_BOOKS: ${{ github.event.inputs.max_books }}
+          PAGE_WORKERS: ${{ github.event.inputs.page_workers }}
+          R2_WEBP: ${{ github.event.inputs.r2_webp }}
+          WORKER_URLS: ${{ github.event.inputs.worker_urls }}
+          RECEIVER_URL: ${{ github.event.inputs.receiver_url }}
+          # 自动注入 GitHub secrets 用于 D1 / R2 等连接
+          S1: ${{ secrets.S1 }}
+          S2: ${{ secrets.S2 }}
+          S3: ${{ secrets.S3 }}
+          S4: ${{ secrets.S4 }}
+          S5: ${{ secrets.S5 }}
+          S6: ${{ secrets.S6 }}
+          S7: ${{ secrets.S7 }}
+          S8: ${{ secrets.S8 }}
+          S9: ${{ secrets.S9 }}
+          SA: ${{ secrets.SA }}
+          SB: ${{ secrets.SB }}
+        run: |
+          echo "[stage] job_start"
+          python src/dodo.py
+          echo "[stage] job_done"
