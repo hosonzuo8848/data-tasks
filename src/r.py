@@ -6,7 +6,7 @@ I=int(os.environ["I"]);N=int(os.environ["N"]);L=os.environ["L"]
 K=os.environ["S1"].encode();E=os.environ["S2"];A=os.environ["S3"];SK=os.environ["S4"]
 B=os.environ.get("S5","b1");C=os.environ["S6"];T=os.environ["S7"];D=os.environ["S8"]
 H=os.environ["S9"];W=os.environ.get("SA","");X=os.environ.get("SB","")
-TD=[f"{i}{X}" for i in range(1,31)]
+TD=([X] if str(X).startswith("http") else [f"{i}{X}" for i in range(1,31)])
 Q=85;CL=3000;UA="Mozilla/5.0";it_cat="医书"
 
 s3=boto3.client("s3",endpoint_url=E,aws_access_key_id=A,aws_secret_access_key=SK,region_name="auto")
@@ -55,7 +55,7 @@ def tp(p,bk,ti,v,sb,pc,by):
     ts=str(int(time.time()));sh=hashlib.sha256(by).hexdigest()
     pa="/upload";ms=f"{ts}\n{pa}\n{sh}".encode()
     sg=hmac.new(K,ms,hashlib.sha256).hexdigest()
-    dm=random.choice(TD);u=f"https://{dm}{pa}"
+    dm=random.choice(TD);u=(dm+pa) if str(dm).startswith("http") else f"https://{dm}{pa}"
     pr={"part":p,"cat":it_cat,"book":bk,"title":ti,"vol":v,"sub":sb or"","pages":pc,"ts":ts,"sig":sg}
     for a in range(5):
         try:
