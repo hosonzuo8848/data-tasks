@@ -1,0 +1,50 @@
+name: sync
+on:
+  workflow_dispatch:
+    inputs:
+      n:
+        required: true
+        default: '20'
+      list:
+        required: true
+        default: 'data/list.csv'
+
+jobs:
+  run:
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        i: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          sudo apt-get update -y && sudo apt-get install -y webp
+          pip install --quiet requests boto3 Pillow PyMuPDF
+      - env:
+          I: ${{ matrix.i }}
+          N: ${{ github.event.inputs.n }}
+          L: ${{ github.event.inputs.list }}
+          S1: ${{ secrets.S1 }}
+          S2: ${{ secrets.S2 }}
+          S3: ${{ secrets.S3 }}
+          S4: ${{ secrets.S4 }}
+          S5: ${{ secrets.S5 }}
+          S6: ${{ secrets.S6 }}
+          S7: ${{ secrets.S7 }}
+          S8: ${{ secrets.S8 }}
+          S9: ${{ secrets.S9 }}
+          SA: ${{ secrets.SA }}
+          SB: ${{ secrets.SB }}
+        run: python src/r.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: r_${{ matrix.i }}
+          path: r.json
+          retention-days: 7
