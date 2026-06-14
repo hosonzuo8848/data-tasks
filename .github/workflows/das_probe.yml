@@ -10,78 +10,11 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
+        with:
+          python-version: "3.12"
       - run: pip install requests
-      - name: write probe script
-        run: |
-          cat > probe_b64.txt <<'EOF'
-            IyDjgJBDQ+S4i+i9vee6v8K35YaF6ZajQklE5pS75YWzwrfkupHnq6/lrp7mtYvohJrmnKzjgJEKIyDnm67nmoQ65Zyo5rW35aSW
-            IElQKEdpdEh1YiBBY3Rpb25zIHJ1bm5lcinkuIrpqozor4HlhoXplqPlrpjmlrnmiZPljIXkuIvovb3pk77ot686CiMgICBJSUlG
-            IGlkIC0tKOacrOWcsC9DRE7lj6/ovr4pLS0+IG1hbmlmZXN0IC0tPiBEQVMgQklEKEYxLi4uKQojICAgLS0o5rW35aSWSVApLS0+
-            IGxpc3RQaG90byhCSUQpIC0tPiDlkITlhoogTS1pZCAtLT4gYXV0b19jb252ZXJzaW9uL2Rvd25sb2FkIC0tPiDmlbTlhoogWklQ
-            CiMg5aSN5Yi7IGJvb2tnZXQgYXBwL25hdGlvbmFsanAuZ28g55qE5Y2P6K6uKGNvb2tpZWphciDnu7TmjIHkvJror50p44CC5Y+q
-            6aqM6K+BIDEg5pysLOS4jemHj+S6p+OAggojIOeUqOazlTogcHl0aG9uIGRhc196aXBfcHJvYmUucHkgPElJSUZfSUQ+ICAgICAg
-            ICAgICAgKOm7mOiupCAxMDc5MTg0IOmjsuiGs+ato+imgSAxNTXpobXljZXku7blkI0pCmltcG9ydCBzeXMsIHJlLCBvcywgdGlt
-            ZSwganNvbiwgdXJsbGliLnBhcnNlLCByZXF1ZXN0cwoKSUlJRl9JRCA9IHN5cy5hcmd2WzFdIGlmIGxlbihzeXMuYXJndikgPiAx
-            IGVsc2UgIjEwNzkxODQiCkhPU1QgPSAid3d3LmRpZ2l0YWwuYXJjaGl2ZXMuZ28uanAiCkJBU0UgPSBmImh0dHBzOi8ve0hPU1R9
-            IgpVQSA9ICJNb3ppbGxhLzUuMCAoV2luZG93cyBOVCAxMC4wOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1M
-            LCBsaWtlIEdlY2tvKSBDaHJvbWUvMTI0LjAgU2FmYXJpLzUzNy4zNiIKT1VUID0gb3MuZW52aXJvbi5nZXQoIk9VVF9ESVIiLCAi
-            LiIpCm9zLm1ha2VkaXJzKE9VVCwgZXhpc3Rfb2s9VHJ1ZSkKClMgPSByZXF1ZXN0cy5TZXNzaW9uKCkgICAgICAgICAgICAgICAg
-            ICMg5Y2VIFNlc3Npb24gPSDlpI3liLsgYm9va2dldCBjb29raWVqYXIobGlzdFBob3RvIOenjSBjb29raWUsZG93bmxvYWQg5bim
-            5LiKKQpTLmhlYWRlcnMudXBkYXRlKHsiVXNlci1BZ2VudCI6IFVBLCAiQWNjZXB0LUxhbmd1YWdlIjogImphLGVuO3E9MC44In0p
-            CgpkZWYgbG9nKCphKTogcHJpbnQoKmEsIGZsdXNoPVRydWUpCgojIC0tLS0gMSkgSUlJRiBtYW5pZmVzdCAtPiBEQVMgQklEICjo
-            v5nkuIDmraXmtbflpJYv5Zu95YaF6YO95Y+vLENETiDlj6/ovr4pIC0tLS0KbXVybCA9IGYie0JBU0V9L2FwaS9paWlmL3tJSUlG
-            X0lEfS9tYW5pZmVzdC5qc29uIgpsb2coZiJbMV0gbWFuaWZlc3Q6IHttdXJsfSIpCm0gPSBTLmdldChtdXJsLCB0aW1lb3V0PTYw
-            KTsgbS5yYWlzZV9mb3Jfc3RhdHVzKCkKbXQgPSBtLnRleHQKYmlkcyA9IHNvcnRlZChzZXQocmUuZmluZGFsbChyIihGWzAxXVxk
-            ezE4fSkiLCBtdCkpKQpuY2FudmFzID0gbGVuKGpzb24ubG9hZHMobXQpLmdldCgic2VxdWVuY2VzIiwgW3t9XSlbMF0uZ2V0KCJj
-            YW52YXNlcyIsIFtdKSkKbG9nKGYiICAgIHBhZ2VzKGNhbnZhcyk9e25jYW52YXN9ICBCSUQgY2FuZGlkYXRlcz17Ymlkc30iKQpp
-            ZiBub3QgYmlkczoKICAgIGxvZygiRkFUQUw6IG5vIEJJRCBpbiBtYW5pZmVzdCIpOyBzeXMuZXhpdCgyKQpCSUQgPSBiaWRzWzBd
-            CmxvZyhmIiAgICA9PiBEQVMgQklEID0ge0JJRH0iKQoKIyDlhYjorr/pl64gdmlld2VyL2ZpbGUg6aG156eNIGNvb2tpZSjmnInk
-            upsgREFTIOWQjuerr+imgeaxguWFiOacieS8muivnSkKZm9yIHdhcm0gaW4gKGYie0JBU0V9L2ZpbGUve0lJSUZfSUR9IiwgZiJ7
-            QkFTRX0vaW1nL3tJSUlGX0lEfSIpOgogICAgdHJ5OgogICAgICAgIHIgPSBTLmdldCh3YXJtLCB0aW1lb3V0PTQ1KQogICAgICAg
-            IGxvZyhmIlt3YXJtXSB7d2FybX0gLT4ge3Iuc3RhdHVzX2NvZGV9IChjb29raWVzIG5vdzoge2xpc3QoUy5jb29raWVzLmtleXMo
-            KSl9KSIpCiAgICBleGNlcHQgRXhjZXB0aW9uIGFzIGU6CiAgICAgICAgbG9nKGYiW3dhcm1dIHt3YXJtfSBFUlIge2V9IikKCiMg
-            LS0tLSAyKSBsaXN0UGhvdG8oQklEKSAtPiDlkITlhoogTS1pZCAtLS0tCiMgYm9va2dldDogR0VUIC9EQVMvbWV0YS9saXN0UGhv
-            dG8/TEFORz1kZWZhdWx0JkJJRD0uLiZJRD0mTk89JlRZUEU9ZGxqcGVnJkRMX1RZUEU9anBlZwpscCA9IGYie0JBU0V9L0RBUy9t
-            ZXRhL2xpc3RQaG90bz9MQU5HPWRlZmF1bHQmQklEPXtCSUR9JklEPSZOTz0mVFlQRT1kbGpwZWcmRExfVFlQRT1qcGVnIgpsb2co
-            ZiJbMl0gbGlzdFBob3RvOiB7bHB9IikKdHJ5OgogICAgciA9IFMuZ2V0KGxwLCBoZWFkZXJzPXsiUmVmZXJlciI6IGYie0JBU0V9
-            L2ZpbGUve0lJSUZfSUR9In0sIHRpbWVvdXQ9OTApCiAgICBsb2coZiIgICAgSFRUUCB7ci5zdGF0dXNfY29kZX0gIGxlbj17bGVu
-            KHIudGV4dCl9IikKICAgIG9wZW4ob3MucGF0aC5qb2luKE9VVCwgZiJsaXN0UGhvdG9fe0JJRH0uaHRtbCIpLCAidyIsIGVuY29k
-            aW5nPSJ1dGYtOCIpLndyaXRlKHIudGV4dCkKICAgIGh0bWwgPSByLnRleHQKZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgbG9n
-            KGYiICAgIGxpc3RQaG90byBFUlIge2V9Iik7IHN5cy5leGl0KDMpCgppZiAiSFRUUCBTdGF0dXMgNDA0IiBpbiBodG1sIG9yIHIu
-            c3RhdHVzX2NvZGUgPT0gNDA0OgogICAgbG9nKCIgICAgISEgNDA0IOKAlCBCSUQg5LiN6KKrIERBUyDmjqXlj5cg5oiWIOivpei3
-            r+W+hOWcsOeQhuWwgemUgeOAguingeaKpeWRiuiviuaWreOAgiIpCiMgYm9va2dldCDmraPliJk6PGlucHV0IC4uLiBwb3NpPSJO
-            IiAuLi4gdmFsdWU9Ik0uLi4uIj4KbWF0Y2hlcyA9IHJlLmZpbmRhbGwocic8aW5wdXRbXj5dK3Bvc2k9WyJcJ10oWzAtOV0rKVsi
-            XCddW14+XSt2YWx1ZT1bIlwnXShbQS1aYS16MC05XSspWyJcJ10nLCBodG1sKQpsb2coZiIgICAgcG9zaS92YWx1ZSjlhoopIG1h
-            dGNoZXMgPSB7bGVuKG1hdGNoZXMpfToge21hdGNoZXNbOjEwXX0iKQojIOWFnOW6lTrku7vmhI8gTS1pZAptaWRzX2FueSA9IHNv
-            cnRlZChzZXQocmUuZmluZGFsbChyJyhNWzAtOUEtWmEtel17MTUsfSknLCBodG1sKSkpCmxvZyhmIiAgICBhbnkgTS1pZHMgaW4g
-            cGFnZSA9IHttaWRzX2FueVs6MTBdfSIpCgp2b2xzID0gW10KZm9yIHBvc2ksIHZhbCBpbiBtYXRjaGVzOgogICAgaWYgbGVuKG1h
-            dGNoZXMpID4gMSBhbmQgKHBvc2kgPT0gIjAiIG9yIHZhbCA9PSAiIik6ICAjIOi3s+i/h+WFqOmAieahhgogICAgICAgIGNvbnRp
-            bnVlCiAgICB2b2xzLmFwcGVuZCh2YWwpCmlmIG5vdCB2b2xzOgogICAgdm9scyA9IG1pZHNfYW55ICAgIyDlhZzlupUKbG9nKGYi
-            ICAgID0+IHZvbHVtZSjlhoopIE0taWRzID0ge3ZvbHNbOjEwXX0gKHRvdGFsIHtsZW4odm9scyl9KSIpCmlmIG5vdCB2b2xzOgog
-            ICAgbG9nKCJGQVRBTDogbGlzdFBob3RvIOayoeaLv+WIsOS7u+S9leWGiiBNLWlk44CCIik7IHN5cy5leGl0KDQpCgojIC0tLS0g
-            MykgYXV0b19jb252ZXJzaW9uL2Rvd25sb2FkKE0taWQpIC0+IOaVtOWGiiBaSVAgLS0tLQojIGJvb2tnZXQ6IFBPU1QgL2Fjdi9h
-            dXRvX2NvbnZlcnNpb24vZG93bmxvYWQgIGJvZHk6IERMX1RZUEU9anAyJmlkX3tpbmRleH09e00taWR9CmRsID0gZiJ7QkFTRX0v
-            YWN2L2F1dG9fY29udmVyc2lvbi9kb3dubG9hZCIKZm9yIGksIHZpZCBpbiBlbnVtZXJhdGUodm9sc1s6MV0sIDEpOiAgICAgIyDl
-            j6rpqoznrKwgMSDlhooKICAgIGJvZHkgPSBmIkRMX1RZUEU9anAyJmlkX3tpfT17dmlkfSIKICAgIGxvZyhmIlszXSBkb3dubG9h
-            ZCBQT1NUIHtkbH0gIGJvZHk9e2JvZHl9IikKICAgIHRyeToKICAgICAgICByID0gUy5wb3N0KGRsLCBkYXRhPWJvZHksCiAgICAg
-            ICAgICAgICAgICAgICBoZWFkZXJzPXsiQ29udGVudC1UeXBlIjogImFwcGxpY2F0aW9uL3gtd3d3LWZvcm0tdXJsZW5jb2RlZCIs
-            CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAiUmVmZXJlciI6IGxwfSwKICAgICAgICAgICAgICAgICAgIHRpbWVvdXQ9NjAw
-            LCBzdHJlYW09VHJ1ZSkKICAgICAgICBjdCA9IHIuaGVhZGVycy5nZXQoIkNvbnRlbnQtVHlwZSIsICIiKQogICAgICAgIGNsID0g
-            ci5oZWFkZXJzLmdldCgiQ29udGVudC1MZW5ndGgiLCAiPyIpCiAgICAgICAgbG9nKGYiICAgIEhUVFAge3Iuc3RhdHVzX2NvZGV9
-            ICBDb250ZW50LVR5cGU9e2N0fSAgQ29udGVudC1MZW5ndGg9e2NsfSIpCiAgICAgICAgZGVzdCA9IG9zLnBhdGguam9pbihPVVQs
-            IGYie0JJRH1fdm9se2k6MDRkfS56aXAiKQogICAgICAgIHRvdGFsID0gMAogICAgICAgIHdpdGggb3BlbihkZXN0LCAid2IiKSBh
-            cyBmOgogICAgICAgICAgICBmb3IgY2h1bmsgaW4gci5pdGVyX2NvbnRlbnQoNjU1MzYpOgogICAgICAgICAgICAgICAgaWYgY2h1
-            bms6CiAgICAgICAgICAgICAgICAgICAgZi53cml0ZShjaHVuayk7IHRvdGFsICs9IGxlbihjaHVuaykKICAgICAgICBsb2coZiIg
-            ICAgd3JvdGUge2Rlc3R9ICBieXRlcz17dG90YWx9IikKICAgICAgICBoZWFkID0gb3BlbihkZXN0LCAicmIiKS5yZWFkKDQpCiAg
-            ICAgICAgbG9nKGYiICAgIG1hZ2ljPXtoZWFkIXJ9ICBpc196aXA9e2hlYWRbOjJdPT1iJ1BLJ30iKQogICAgICAgIGlmIGhlYWRb
-            OjJdICE9IGIiUEsiOgogICAgICAgICAgICBsb2coIiAgICAhISDkuI3mmK8gWklQKOWPr+iDveaYryBIVE1MIOmUmeivr+mhtS/p
-            h43lrprlkJEp44CC5YmNIDMwMCDlrZfoioI6IikKICAgICAgICAgICAgbG9nKG9wZW4oZGVzdCwgInJiIikucmVhZCgzMDApKQog
-            ICAgZXhjZXB0IEV4Y2VwdGlvbiBhcyBlOgogICAgICAgIGxvZyhmIiAgICBkb3dubG9hZCBFUlIge2V9IikKCmxvZygiRE9ORSIp
-            Cg==
-EOF
-          python -c "import base64;open('das_zip_probe.py','w',encoding='utf-8').write(base64.b64decode(open('probe_b64.txt').read().replace(chr(10),'').replace(' ','')).decode('utf-8'))"
       - name: run probe
         env:
           OUT_DIR: out
